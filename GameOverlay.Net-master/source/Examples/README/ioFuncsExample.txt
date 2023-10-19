@@ -1,0 +1,57 @@
+g_workDir = "swordmasLite/luaShenanigans/"
+
+-- the above should be where you store your lua stuff, so if you're working on SR, you'd put "SR/hks_debug_shit/" or something. note that this requires your setup to be in the folder SR, with hks_debug_shit as a folder within your setup. put this shit right above function Update in the c0000.hks
+
+function shittyPrint(filePathRel, stringThing)
+    -- Define the path to the output file
+    local filePath = g_workDir .. filePathRel
+
+    -- Open the file for writing
+    local file = io.open(filePath, "w")
+
+    if file then
+        -- Write the Lua version to the file
+        file:write(stringThing)
+        
+        -- Close the file
+        file:close()
+    end
+end
+function shittyAppend(filePathRel, stringThing)
+    -- Define the path to the output file
+    local filePath = g_workDir .. filePathRel
+
+    -- Open the file for writing
+    local file = io.open(filePath, "a")
+
+    if file then
+        -- Write the Lua version to the file
+        file:write(stringThing)
+        
+        -- Close the file
+        file:close()
+    end
+end
+
+pipe = io.open("\\\\.\\pipe\\myPipeOutSekiroMastery", "w+")
+
+-- opens a named pipe called myPipeOutSekiroMastery
+
+function pipeWrite(header, args) --string and table
+    local currentTime = tostring(string.format("%0f", os.time()))
+    local generateLine = header .. ":"
+    for i,v in pairs(args) do
+        generateLine = generateLine .. v .. ":"
+    end
+    generateLine = generateLine .. currentTime .. "\n"
+    -- basically just writes the string "yourheadercommand:argument0:argument1:argumentetc:time"
+    if pipe then
+        pipe:write(generateLine)
+        pipe:flush()
+        -- writes and flushes the pipe as well as prints the last command to PipeTest.txt for debugging.
+        shittyPrint("PipeTest.txt", generateLine)
+    else
+        pipe = io.open("\\\\.\\pipe\\myPipeOutSekiroMastery", "w+")
+        --shittyPrint("PipeTest.txt", "no")
+    end
+end
